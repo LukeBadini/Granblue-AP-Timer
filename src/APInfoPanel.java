@@ -9,13 +9,14 @@ import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
 
-public class DetailsPanel extends JPanel
+public class APInfoPanel extends JPanel
 {
 	private final int MINUTES_PER_AP = 5;
+	private final int S_PER_MINUTE = 60;
 	
 	private EventListenerList listenerList = new EventListenerList();
 	
-	public DetailsPanel()
+	public APInfoPanel()
 	{
 		Dimension size = getPreferredSize();
 		size.width = 250;
@@ -34,14 +35,31 @@ public class DetailsPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				int rank = Integer.valueOf(rankField.getText());
-				int currentAP = Integer.valueOf(currentAPField.getText());
-				int apToRecover = calculateAPToRecover(rank, currentAP);
-				int rechargeTime = apToRecover * MINUTES_PER_AP;
-				
-				String info = Integer.toString(rechargeTime) + " minutes until AP is fully restored.\n" 
-								+ "Recovering " + Integer.toString(apToRecover)+ " AP.\n";
-				fireDetailEvent(new DetailEvent(this, info));
+				try
+				{
+					int rank = Integer.valueOf(rankField.getText());
+					int currentAP = Integer.valueOf(currentAPField.getText());
+					int maxAP = calculateMaxAP(rank);
+					if (currentAP > maxAP)
+					{
+						JOptionPane.showMessageDialog(returnThisDetailsPanel(),
+							    "No AP to recover");
+					}
+					else
+					{
+						int apToRecover = maxAP - currentAP;
+						int rechargeTimeS = apToRecover * MINUTES_PER_AP * S_PER_MINUTE;
+						
+						fireDetailEvent(new APInfoEvent(this, rechargeTimeS));
+					}
+				}
+				catch (NumberFormatException exception)
+				{
+					JOptionPane.showMessageDialog(returnThisDetailsPanel(),
+						    "Please use numbers for \"Rank\" and \"Current AP\" fields.",
+						    "Text error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		
@@ -79,7 +97,13 @@ public class DetailsPanel extends JPanel
 	}
 	
 	
-	private int calculateAPToRecover(int rank, int currentAP)
+	private APInfoPanel returnThisDetailsPanel()
+	{
+		return this;
+	}
+	
+	
+	private int calculateMaxAP(int rank)
 	{
 		float maxAP = 10;
 		final int FIRSTGAP = 12;
@@ -103,33 +127,33 @@ public class DetailsPanel extends JPanel
 			maxAP += Math.ceil(80 + ((rank - THIRDGAP) / 3.0));
 		}
 		
-		return ((int)maxAP - currentAP);
+		return (int)maxAP;
 	}
 	
 	
-	public void fireDetailEvent(DetailEvent event)
+	public void fireDetailEvent(APInfoEvent event)
 	{
 		Object[] listeners = listenerList.getListenerList();
 		for (int i = 0; i < listeners.length; i += 2)
 		{
-			if (listeners[i] == DetailListener.class)
+			if (listeners[i] == APInfoListener.class)
 			{
-				((DetailListener) listeners[i + 1]).detailEventOccured(event); 
+				((APInfoListener) listeners[i + 1]).detailEventOccured(event); 
 			}
 		}
 		
 	}
 	
 	
-	public void addDetailListener(DetailListener listener)
+	public void addDetailListener(APInfoListener listener)
 	{
-		listenerList.add(DetailListener.class, listener);
+		listenerList.add(APInfoListener.class, listener);
 	}
 	
 	
-	public void removeDetailListener(DetailListener listener)
+	public void removeDetailListener(APInfoListener listener)
 	{
-		listenerList.remove(DetailListener.class, listener);
+		listenerList.remove(APInfoListener.class, listener);
 	}
 
 }
