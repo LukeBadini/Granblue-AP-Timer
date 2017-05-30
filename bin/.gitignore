@@ -13,3 +13,10 @@
 /APInfoPanel.class
 /APInfoEvent.class
 /APInfoListener.class
+/TimerPanel$1.class
+/TimerPanel$2.class
+/APInfoPanel$2.class
+/StartTimerListener.class
+/StopTimerListener.class
+/MainFrame$2.class
+/ResetTimerListener.class

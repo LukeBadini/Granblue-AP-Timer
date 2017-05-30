@@ -4,6 +4,7 @@ import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Font;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -17,13 +18,7 @@ public class APInfoPanel extends JPanel
 	private EventListenerList listenerList = new EventListenerList();
 	
 	public APInfoPanel()
-	{
-		Dimension size = getPreferredSize();
-		size.width = 250;
-		setPreferredSize(size);
-		
-		setBorder(BorderFactory.createTitledBorder("Character Information"));
-		
+	{		
 		JLabel rankLabel = new JLabel("Rank: ");
 		JLabel currentAPLabel = new JLabel("Current AP: ");
 		
@@ -42,7 +37,7 @@ public class APInfoPanel extends JPanel
 					int maxAP = calculateMaxAP(rank);
 					if (currentAP > maxAP)
 					{
-						JOptionPane.showMessageDialog(returnThisDetailsPanel(),
+						JOptionPane.showMessageDialog(returnThisAPInfoPanel(),
 							    "No AP to recover");
 					}
 					else
@@ -50,18 +45,28 @@ public class APInfoPanel extends JPanel
 						int apToRecover = maxAP - currentAP;
 						int rechargeTimeS = apToRecover * MINUTES_PER_AP * S_PER_MINUTE;
 						
-						fireDetailEvent(new APInfoEvent(this, rechargeTimeS));
+						fireStartTimerEvent(new APInfoEvent(this, rechargeTimeS));
 					}
 				}
 				catch (NumberFormatException exception)
 				{
-					JOptionPane.showMessageDialog(returnThisDetailsPanel(),
-						    "Please use numbers for \"Rank\" and \"Current AP\" fields.",
+					JOptionPane.showMessageDialog(returnThisAPInfoPanel(),
+						    "Please use whole numbers for \"Rank\" and \"Current AP\" fields.",
 						    "Text error",
 						    JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
+		
+		JButton resetTimerButton = new JButton("Reset Timer");
+		resetTimerButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				fireResetTimerEvent(new APInfoEvent(this, 0));
+			}
+		});
+		
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -69,7 +74,7 @@ public class APInfoPanel extends JPanel
 		// First column
 		gc.anchor = GridBagConstraints.LINE_END;
 		gc.weightx = 0.5;
-		gc.weighty = 0.5;
+		gc.weighty = 10;
 		gc.gridx = 0;
 		gc.gridy = 0;
 		add(rankLabel,gc);
@@ -79,7 +84,7 @@ public class APInfoPanel extends JPanel
 		add(currentAPLabel, gc);
 		
 		// Second column
-		gc.anchor = GridBagConstraints.LINE_START;
+		gc.anchor = GridBagConstraints.CENTER;
 		gc.gridx = 1;
 		gc.gridy = 0;
 		add(rankField, gc);
@@ -88,16 +93,20 @@ public class APInfoPanel extends JPanel
 		gc.gridy = 1;
 		add(currentAPField, gc);
 		
-		// Final row
+		// Button row
 		gc.weighty = 10;
-		gc.anchor = GridBagConstraints.FIRST_LINE_START;
-		gc.gridx = 1;
+		gc.anchor = GridBagConstraints.LINE_END;
+		gc.gridx = 0;
 		gc.gridy = 2;
 		add(startTimerButton, gc);
+		
+		gc.anchor = GridBagConstraints.CENTER;
+		gc.gridx = 1;
+		add(resetTimerButton, gc);
 	}
 	
 	
-	private APInfoPanel returnThisDetailsPanel()
+	private APInfoPanel returnThisAPInfoPanel()
 	{
 		return this;
 	}
@@ -131,29 +140,51 @@ public class APInfoPanel extends JPanel
 	}
 	
 	
-	public void fireDetailEvent(APInfoEvent event)
+	public void fireStartTimerEvent(APInfoEvent event)
 	{
 		Object[] listeners = listenerList.getListenerList();
 		for (int i = 0; i < listeners.length; i += 2)
 		{
-			if (listeners[i] == APInfoListener.class)
+			if (listeners[i] == StartTimerListener.class)
 			{
-				((APInfoListener) listeners[i + 1]).detailEventOccured(event); 
+				((StartTimerListener) listeners[i + 1]).startTimerEventOccured(event);
 			}
 		}
-		
 	}
 	
 	
-	public void addDetailListener(APInfoListener listener)
+	public void fireResetTimerEvent(APInfoEvent event)
 	{
-		listenerList.add(APInfoListener.class, listener);
+		Object[] listeners = listenerList.getListenerList();
+		for (int i = 0; i < listeners.length; i += 2)
+		{
+			if (listeners[i] == ResetTimerListener.class)
+			{
+				((ResetTimerListener) listeners[i + 1]).resetTimerEventOccured(event);
+			}
+		}
 	}
 	
 	
-	public void removeDetailListener(APInfoListener listener)
+	public void addStartTimerListener(StartTimerListener listener)
 	{
-		listenerList.remove(APInfoListener.class, listener);
+		listenerList.add(StartTimerListener.class, listener);
+	}
+	
+	
+	public void removeStartTimerListener(StartTimerListener listener)
+	{
+		listenerList.remove(StartTimerListener.class, listener);
+	}
+	
+	public void addResetTimerListener(ResetTimerListener listener)
+	{
+		listenerList.add(ResetTimerListener.class, listener);
+	}
+	
+	public void removeResetTimerListener(ResetTimerListener listener)
+	{
+		listenerList.remove(ResetTimerListener.class, listener);
 	}
 
 }
