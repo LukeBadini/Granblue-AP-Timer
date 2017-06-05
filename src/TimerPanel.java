@@ -11,7 +11,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
-
+/**
+ * A class defining the APInfoPanel. This contains a single text
+ * label that represents the timer.
+ * 
+ * @author Luke Badini
+ */
 public class TimerPanel extends JPanel
 {
 	// This is probably bad, I should instead center the
@@ -22,6 +27,10 @@ public class TimerPanel extends JPanel
 	
 	private Timer timer = new Timer(1000, new ActionListener()
 	{
+		/*
+		 * Defines what to do when the Timer fires an event.
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		public void actionPerformed(ActionEvent event)
 		{
 			timeRemaining--;
@@ -29,10 +38,13 @@ public class TimerPanel extends JPanel
 		}
 	});
 	
+	/**
+	 * Constructor for a TimerPanel. Formats the timer label.
+	 */
 	public TimerPanel()
 	{
 		// Set the initial delay to 0 ms so that the timer starts
-		// as soon as the user presses the "Start" button
+		// as soon as the user presses the "Start Timer" button
 		timer.setInitialDelay(0);
 		timerLabel.setFont(new Font(timerLabel.getName(), Font.PLAIN, 36));		
 		
@@ -45,21 +57,29 @@ public class TimerPanel extends JPanel
 		add(timerLabel, gc);
 	}
 	
-	
+	/**
+	 * Starts this TimerPanel's timer.
+	 * 
+	 * @param timeSec how long the timer will count down for
+	 */
 	public void startTimer(int timeSec)
 	{
 		timeRemaining = timeSec;
 		timer.start();
 	}
 	
-	
+	/**
+	 * Stops the timer and resets the time back to 0 seconds
+	 */
 	public void resetTimer()
 	{
 		timer.stop();
 		timerLabel.setText("00:00:00" + STRING_BUFFER);
 	}
 	
-	
+	/**
+	 * Updates the timer label to display the current time remaining
+	 */
 	private void updateTimer()
 	{
 		String hours = intToFormattedString(timeRemaining / 3600);
@@ -72,7 +92,13 @@ public class TimerPanel extends JPanel
 		}
 	}
 	
-	
+	/**
+	 * Given an int, formats it to a String. If the int is below 10,
+	 * a leading 0 is added to the front of it.
+	 * 
+	 * @param num an integer to convert to a String
+	 * @return the integer converted to a String
+	 */
 	private String intToFormattedString(int num)
 	{
 		if (num < 10)

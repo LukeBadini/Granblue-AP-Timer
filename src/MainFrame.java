@@ -3,7 +3,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-
+/**
+ * A class used to add and format JPanels for the application.
+ * 
+ * @author Luke Badini
+ */
 public class MainFrame extends JFrame
 {
 	private APInfoPanel apInfoPanel;
@@ -18,7 +22,6 @@ public class MainFrame extends JFrame
 		
 		// Create Swing components		
 		timerPanel = new TimerPanel();
-		
 		apInfoPanel = new APInfoPanel();
 		apInfoPanel.addStartTimerListener(new StartTimerListener()
 		{
@@ -36,7 +39,6 @@ public class MainFrame extends JFrame
 				timerPanel.resetTimer();
 			}
 		});
-		
 		
 		// Add Swing components to content pane
 		Container container = getContentPane();
